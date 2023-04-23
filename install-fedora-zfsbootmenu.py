@@ -7,7 +7,7 @@ import stat
 import subprocess
 import time
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from itertools import chain
 from pathlib import Path
@@ -27,8 +27,8 @@ class ZfsPool:
     mountpoint: Union[Path, Literal["none", "legacy"], None] = None
     kind: str = "single"
     password: str = ""
-    pool_properties: Mapping[str, str] = MappingProxyType({})
-    file_system_properties: Mapping[str, str] = MappingProxyType({})
+    pool_properties: Mapping[str, str] = field(default_factory=dict)
+    file_system_properties: Mapping[str, str] = field(default_factory=dict)
 
 
 @dataclass

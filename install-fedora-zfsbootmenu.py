@@ -215,6 +215,10 @@ def main() -> None:
     pool_key_files = create_zfs_pools_and_file_systems()
     efi_disk_uuids = setup_efi_partitions_and_install_zfsbootmenu()
 
+    for rbind_dir in ("dev", "proc", "sys"):
+        mkdir(NEW_SYSTEM_ROOT / rbind_dir)
+        sys("mount", "--rbind", f"/{rbind_dir}", str(NEW_SYSTEM_ROOT / rbind_dir))
+
     install_packages(version_id)
 
     write_crypttab()
@@ -226,9 +230,6 @@ def main() -> None:
         copy2(pool_key_file, NEW_SYSTEM_ROOT / "etc/zfs")
 
     run_systemd_firstboot_and_enable_services()
-
-    for rbind_dir in ("dev", "proc", "sys"):
-        sys("mount", "--rbind", f"/{rbind_dir}", str(NEW_SYSTEM_ROOT / rbind_dir))
 
     with chroot(NEW_SYSTEM_ROOT):
         sys("fixfiles", "-F", "onboot")

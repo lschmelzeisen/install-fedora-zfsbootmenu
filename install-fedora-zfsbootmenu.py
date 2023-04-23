@@ -292,9 +292,7 @@ def install_zfs_to_live_environment(version_id: int) -> None:
     )
     if version_id > 37:
         sys(
-            "sed",
-            "--in-place",
-            "s/$releasever/37/g",
+            *("sed", "--in-place", "s/$releasever/37/g"),
             str(Path("/") / "etc" / "yum.repos.d" / "zfs.repo"),
         )
     dnf_install(f"kernel-devel-{os.uname().release}", "zfs")
@@ -454,9 +452,7 @@ def install_packages(version_id: int) -> None:
     )
     if version_id > 37:
         sys(
-            "sed",
-            "--in-place",
-            "s/$releasever/37/g",
+            *("sed", "--in-place", "s/$releasever/37/g"),
             str(NEW_SYSTEM_ROOT / "etc" / "yum.repos.d" / "zfs.repo"),
         )
 

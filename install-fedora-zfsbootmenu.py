@@ -304,6 +304,8 @@ def install_zfs_to_live_environment(version_id: int) -> None:
 def blkdiscard_and_zero_disks() -> None:
     for pool in CONFIG_POOLS:
         for disk in pool.disks:
+            # For a discussion of blkdiscard vs wipefs vs dd zeros, see:
+            # https://flaterco.com/kb/clearpt.html
             sys("blkdiscard", "--force", str(disk))
             if CONFIG.zero_disks:
                 sys(

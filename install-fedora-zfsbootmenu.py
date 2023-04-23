@@ -240,7 +240,7 @@ def main() -> None:
 
         setup_users()
 
-    # TODO: snapshot before frist boot?
+    # TODO: snapshot before first boot?
     sys(
         "zfs",
         "snapshot",

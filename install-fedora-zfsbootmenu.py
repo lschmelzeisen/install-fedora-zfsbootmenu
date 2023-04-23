@@ -286,7 +286,17 @@ def check_config_for_errors() -> None:
 
 def install_zfs_to_live_environment(version_id: int) -> None:
     sys("rpm", "--erase", "--nodeps", "zfs-fuse")
-    dnf_install(f"https://zfsonlinux.org/fedora/zfs-release.fc{version_id}.noarch.rpm")
+    # TODO: remove version hacks once official ZFS repos for Fedora 38 are released.
+    dnf_install(
+        f"https://zfsonlinux.org/fedora/zfs-release-2-2.fc{min(version_id, 37)}.noarch.rpm"
+    )
+    if version_id > 37:
+        sys(
+            "sed",
+            "--in-place",
+            "s/$releasever/37/g",
+            str(Path("/") / "etc" / "yum.repos.d" / "zfs.repo"),
+        )
     dnf_install(f"kernel-devel-{os.uname().release}", "zfs")
     sys("modprobe", "zfs")
 
@@ -423,8 +433,10 @@ def install_packages(version_id: int) -> None:
     # For example: "en_US.UTF-8" -> "en".
     locale_lang = CONFIG.locale[: CONFIG.locale.index("_")]
 
+    # TODO: remove version hacks once official ZFS repos for Fedora 38 are released.
     dnf_install(
-        f"https://zfsonlinux.org/fedora/zfs-release.fc{version_id}.noarch.rpm",
+        "https://zfsonlinux.org/fedora/"
+        f"zfs-release-2-2.fc{min(version_id, 37)}.noarch.rpm",
         "@core",
         "kernel",
         "kernel-devel",
@@ -438,6 +450,13 @@ def install_packages(version_id: int) -> None:
         installroot=NEW_SYSTEM_ROOT,
         releasever=version_id,
     )
+    if version_id > 37:
+        sys(
+            "sed",
+            "--in-place",
+            "s/$releasever/37/g",
+            str(NEW_SYSTEM_ROOT / "etc" / "yum.repos.d" / "zfs.repo"),
+        )
 
 
 def write_crypttab() -> None:

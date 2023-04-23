@@ -201,8 +201,12 @@ def main() -> None:
 
     sys("setenforce", "0")
 
-    version_id = sys_output(
-        'source /etc/os-release; echo "$VERSION_ID"', shell=True, dry_mode_output="36"
+    version_id = int(
+        sys_output(
+            'source /etc/os-release; echo "$VERSION_ID"',
+            shell=True,
+            dry_mode_output="36",
+        )
     )
     install_zfs_to_live_environment(version_id)
 
@@ -279,7 +283,7 @@ def check_config_for_errors() -> None:
         seen_user_names.add(user.name)
 
 
-def install_zfs_to_live_environment(version_id: str) -> None:
+def install_zfs_to_live_environment(version_id: int) -> None:
     sys("rpm", "--erase", "--nodeps", "zfs-fuse")
     dnf_install(f"https://zfsonlinux.org/fedora/zfs-release.fc{version_id}.noarch.rpm")
     dnf_install(f"kernel-devel-{os.uname().release}", "zfs")
@@ -414,7 +418,7 @@ def setup_efi_partitions_and_install_zfsbootmenu() -> Sequence[str]:
     return efi_disk_uuids
 
 
-def install_packages(version_id: str) -> None:
+def install_packages(version_id: int) -> None:
     # For example: "en_US.UTF-8" -> "en".
     locale_lang = CONFIG.locale[: CONFIG.locale.index("_")]
 
@@ -614,7 +618,7 @@ def zfs_create(
 def dnf_install(
     *args: str,
     installroot: Optional[Path] = None,
-    releasever: Optional[str] = None,
+    releasever: Optional[int] = None,
 ) -> None:
     dnf_install_args = ["dnf", "install", "--assumeyes"]
     if installroot:
